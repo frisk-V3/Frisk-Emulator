@@ -1,0 +1,44 @@
+{
+  "name": "frisk-emulator",
+  "version": "1.0.0",
+  "description": "A high-performance virtual machine and emulator built with TypeScript",
+  "main": "dist/main/index.js",
+  "author": "Your Name",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build:renderer": "vite build",
+    "build:main": "tsc -p tsconfig.main.json",
+    "build:rom": "ts-node src/assembler/frisk-asm.ts games/boot.asm loading/default.bin",
+    "dist": "npm run build:renderer && npm run build:main && electron-builder",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "electron-updater": "^6.1.7"
+  },
+  "devDependencies": {
+    "electron": "^28.2.0",
+    "electron-builder": "^24.9.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12",
+    "ts-node": "^10.9.2",
+    "vitest": "^1.2.1",
+    "@types/node": "^20.11.10",
+    "rimraf": "^5.0.5"
+  },
+  "build": {
+    "appId": "com.frisk.emulator",
+    "productName": "Frisk-Emulator",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "dist/main/**/*",
+      "dist/renderer/**/*",
+      "loading/**/*"
+    ],
+    "win": {
+      "target": "portable"
+    }
+  }
+}
