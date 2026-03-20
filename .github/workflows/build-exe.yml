@@ -2,27 +2,36 @@ name: Build Frisk Emulator EXE
 
 on:
   push:
-    tags: ["v*"] # v1.0.0 などのタグがついた時に発動
+    tags: ["v*"] # v1.0.0 などのタグプッシュで発動
+  workflow_dispatch: # 手動実行ボタンも追加
 
 jobs:
   build:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          # Chromebook対策: cache指定を削除
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm install
 
-      - name: Build Electron App
-        run: npm run build # ViteビルドとElectron Builderを実行
+      - name: Build Renderer and Main
+        run: |
+          npm run build:renderer
+          npm run build:main
+
+      - name: Build Electron EXE
+        run: npx electron-builder --windows
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Release EXE
         uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: dist/*.exe # 生成されたインストーラーを指定
+          files: dist/*.exe
